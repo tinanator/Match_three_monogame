@@ -1,0 +1,9 @@
+# Build artifacts
+[Bb]in/
+[Oo]bj/
+
+# Rider
+.idea/
+
+# macOS
+.DS_Store
