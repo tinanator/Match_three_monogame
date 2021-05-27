@@ -14,7 +14,11 @@ namespace Project1
 
     enum GameState
     {
-        click, swap, findMatches, dropItems, findMatchesAfterSwap
+        click, 
+        swap, 
+        findMatches, 
+        dropItems, 
+        findMatchesAfterSwap
     }
     class GameField
     {
@@ -34,53 +38,54 @@ namespace Project1
 
         private SpriteFont font;
 
-        public GameField(Dictionary<ItemTypes, Texture2D> atlas, SpriteFont font)
+        private Item generateItem(int randInt, Position cell) 
         {
-            this.atlas = atlas;
-            this.font = font;
+            Item item;
+            switch (randInt) {
+                case 0:
+                    return new Item(ItemTypes.square, cell, atlas[ItemTypes.square]);
+                case 1:
+                    return new Item(ItemTypes.circle, cell, atlas[ItemTypes.circle]);
+                case 2:
+                    return new Item(ItemTypes.romb, cell, atlas[ItemTypes.romb]);
+                case 3:
+                    return new Item(ItemTypes.star, cell, atlas[ItemTypes.star]);
+                default:
+                    return new Item(ItemTypes.triangle, cell, atlas[ItemTypes.triangle]);
+            }
+        }
+
+        private void generateField() {
             var rand = new Random();
             Position cell = new Position(0, 0);
             for (int row = 0; row < Constants.ROWCOUNT; row++)
             {
                 for (int col = 0; col < Constants.ROWCOUNT; col++)
                 {
-                    if (rand.Next(5) == 0)
-                    {
-                        cells[cell] = new Item(ItemTypes.square, cell, atlas[ItemTypes.square]);
-                    }
-                    else if (rand.Next(5) == 1)
-                    {
-                        cells[cell] = new Item(ItemTypes.circle, cell, atlas[ItemTypes.circle]);
-                    }
-                    else if (rand.Next(5) == 2)
-                    {
-                        cells[cell] = new Item(ItemTypes.romb, cell, atlas[ItemTypes.romb]);
-                    }
-                    else if (rand.Next(5) == 3)
-                    {
-                        cells[cell] = new Item(ItemTypes.star, cell, atlas[ItemTypes.star]);
-                    }
-                    else 
-                    {
-                        cells[cell] = new Item(ItemTypes.triangle, cell, atlas[ItemTypes.triangle]);
-                    }
+                    cells[cell] = generateItem(rand.Next(5), cell);
                     cell.update(cell.x + 1, cell.y);
                 }
                 cell.update(0, cell.y + 1);
             }
 
-            while (findMatches() > 0) {
+            while (findMatches() > 0)
+            {
                 dropItems();
             }
-            
 
             score = 0;
         }
-        public void placeItems(SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
+        public GameField(Dictionary<ItemTypes, Texture2D> atlas, SpriteFont font)
+        {
+            this.atlas = atlas;
+            this.font = font;
+            generateField();
+        }
+        public void placeItems(SpriteBatch spriteBatch)
         {
             foreach (Position cell in cells.Keys)
             {
-                cells[cell].draw(spriteBatch, graphics);
+                cells[cell].draw(spriteBatch);
             }
         }
 
@@ -100,8 +105,8 @@ namespace Project1
 
         public void onClick(int x, int y)
         {
-            int _x = Convert.ToInt32(x / Constants.CELLSIZE);
-            int _y = Convert.ToInt32(y / Constants.CELLSIZE);
+            int _x = x / Constants.CELLSIZE;
+            int _y = y / Constants.CELLSIZE;
             Position cell = new Position(_x, _y);
             if (clicked)
             {
@@ -111,27 +116,15 @@ namespace Project1
                 {
                     return;
                 }
-                Debug.WriteLine("second click");
-                if (cell.y == clickedItem1.y)
+                if (cell.y == clickedItem1.y && (cell.x - 1 == clickedItem1.x || cell.x + 1 == clickedItem1.x) ||
+                    cell.x == clickedItem1.x && (cell.y - 1 == clickedItem1.y || cell.y + 1 == clickedItem1.y))
                 {
-                    if (cell.x - 1 == clickedItem1.x || cell.x + 1 == clickedItem1.x)
-                    {
-                        gameState = GameState.swap;
-                        clickedItem2 = cell;
-                    }
-                }
-                else if (cell.x == clickedItem1.x)
-                {
-                    if (cell.y - 1 == clickedItem1.y || cell.y + 1 == clickedItem1.y)
-                    {
-                        gameState = GameState.swap;
-                        clickedItem2 = cell;
-                    }
+                    gameState = GameState.swap;
+                    clickedItem2 = cell;
                 }
             }
             else
             {
-                Debug.WriteLine("first click");
                 if (cells.ContainsKey(cell))
                 {
                     ItemTypes type = cells[cell].ItemType;
@@ -142,6 +135,7 @@ namespace Project1
 
             }
         }
+
 
         private bool isMatchThree(Position pos)
         {
@@ -214,78 +208,66 @@ namespace Project1
             return false;
         }
 
-
         private int findMatches() {
             int matches = 0;
-            Debug.WriteLine("FINDMATCHES");
             foreach (Position cell in cells.Keys)
             {
-                if (!cells[cell].isToRemove && isMatchThree(cell))
+                if (!cells[cell].IsToRemove && isMatchThree(cell))
                 {
                     matches++;
-                    Debug.WriteLine("match found");
-                    cells[cell].isToRemove = true;
-                    if (cells[cell].State == threeMatchState.horizontal)
-                    {
-                        Debug.WriteLine("horizontal");
-                        double x = cell.x + 1;
-                        ItemTypes type = cells[cell].ItemType;
-                        Position newCell = new Position(x, cell.y);
-                        while (x < Constants.ROWCOUNT)
-                        {
-                            if (cells[newCell].isToRemove || cells[newCell].ItemType != type)
-                            {
-                                break;
-                            }
-                            cells[newCell].isToRemove = true;
-                            x++;
-                            newCell.update(x, cell.y);
-                        }
-                        x = cell.x - 1;
-                        newCell.update(x, cell.y);
-                        while (x >= 0)
-                        {
-                            if (cells[newCell].isToRemove || cells[newCell].ItemType != type)
-                            {
-                                break;
-                            }
-                            cells[newCell].isToRemove = true;
-                            x--;
-                            newCell.update(x, cell.y);
-                        }
-                        cells[cell].State = threeMatchState.none;
+                    cells[cell].IsToRemove = true;
+          
+                    double x = cell.x + 1;
+                    ItemTypes type = cells[cell].ItemType;
+                    Position newCell = new Position(x, cell.y);
 
-                    }
-                    else if (cells[cell].State == threeMatchState.vertical)
+                    while (x < Constants.ROWCOUNT)
                     {
-                        Debug.WriteLine("vertical");
-                        double y = cell.y + 1;
-                        ItemTypes type = cells[cell].ItemType;
-                        Position newCell = new Position(cell.x, y);
-                        while (y < Constants.ROWCOUNT)
+                        if (cells[newCell].IsToRemove || cells[newCell].ItemType != type)
                         {
-                            if (cells[newCell].isToRemove || cells[newCell].ItemType != type)
-                            {
-                                break;
-                            }
-                            cells[newCell].isToRemove = true;
-                            y++;
-                            newCell.update(cell.x, y);
+                            break;
                         }
-                        y = cell.y - 1;
-                        newCell.update(cell.x, y);
-                        while (y >= 0)
-                        {
-                            if (cells[newCell].isToRemove || cells[newCell].ItemType != type)
-                            {
-                                break;
-                            }
-                            cells[newCell].isToRemove = true;
-                            y--;
-                            newCell.update(cell.x, y);
-                        }
-                        cells[cell].State = threeMatchState.none;
+                        cells[newCell].IsToRemove = true;
+                        x++;
+                        newCell.update(x, cell.y);
                     }
+                    x = cell.x - 1;
+                    newCell.update(x, cell.y);
+                    while (x >= 0)
+                    {
+                        if (cells[newCell].IsToRemove || cells[newCell].ItemType != type)
+                        {
+                            break;
+                        }
+                        cells[newCell].IsToRemove = true;
+                        x--;
+                        newCell.update(x, cell.y);
+                    }
+
+                    double y = cell.y + 1;
+                    newCell = new Position(cell.x, y);
+                    while (y < Constants.ROWCOUNT)
+                    {
+                        if (cells[newCell].IsToRemove || cells[newCell].ItemType != type)
+                        {
+                            break;
+                        }
+                        cells[newCell].IsToRemove = true;
+                        y++;
+                        newCell.update(cell.x, y);
+                    }
+                    y = cell.y - 1;
+                    newCell.update(cell.x, y);
+                    while (y >= 0)
+                    {
+                        if (cells[newCell].IsToRemove || cells[newCell].ItemType != type)
+                        {
+                            break;
+                        }
+                        cells[newCell].IsToRemove = true;
+                        y--;
+                        newCell.update(cell.x, y);
+                    }   
                 }
             }
             if (matches == 0)
@@ -302,7 +284,7 @@ namespace Project1
                 for (int x = 0; x < Constants.ROWCOUNT; x++)
                 {
                     Position curcell = new Position(x, y);
-                    while (cells[curcell].isToRemove)
+                    while (cells[curcell].IsToRemove)
                     {
                         score++;
                         Position tmp = curcell;
@@ -314,26 +296,7 @@ namespace Project1
                             tmp = above;
                             above.update(x, tmp.y - 1); ;
                         }
-                        if (rand.Next(5) == 0)
-                        {
-                            cells[tmp] = new Item(ItemTypes.square, tmp, atlas[ItemTypes.square]);
-                        }
-                        else if (rand.Next(5) == 1)
-                        {
-                            cells[tmp] = new Item(ItemTypes.circle, tmp, atlas[ItemTypes.circle]);
-                        }
-                        else if (rand.Next(5) == 2)
-                        {
-                            cells[tmp] = new Item(ItemTypes.romb, tmp, atlas[ItemTypes.romb]);
-                        }
-                        else if (rand.Next(5) == 3)
-                        {
-                            cells[tmp] = new Item(ItemTypes.star, tmp, atlas[ItemTypes.star]);
-                        }
-                        else
-                        {
-                            cells[tmp] = new Item(ItemTypes.triangle, tmp, atlas[ItemTypes.triangle]);
-                        }
+                        cells[tmp] = generateItem(rand.Next(5), tmp);
                     }
 
 
@@ -342,41 +305,38 @@ namespace Project1
         }
         public void Update(GameTime gameTime)
         {
-            if (gameState == GameState.swap)
-            {
-                Debug.WriteLine("SWAP");
-                swap(clickedItem1, clickedItem2);
-                gameState = GameState.findMatchesAfterSwap;
-            }
-            else if (gameState == GameState.findMatchesAfterSwap) {
-                Debug.WriteLine("FINDMATCHESAFTERSWAP");
-                if (!isMatchThree(clickedItem1) && !isMatchThree(clickedItem2)) {
-                    Debug.WriteLine("no match. swap back");
+            switch (gameState) {
+                case GameState.swap:
                     swap(clickedItem1, clickedItem2);
-                    gameState = GameState.click;
-                    return;
-                }
-                Debug.WriteLine("matches found");
-                gameState = GameState.findMatches;
-            }
-            
-            else if (gameState == GameState.findMatches)
-            {
-                Debug.WriteLine("FINDMATCHES");
-                findMatches();
-                gameState = GameState.dropItems;
-            }
-            else if (gameState == GameState.dropItems)
-            {
-                Debug.WriteLine("DROPITEMS");
-                dropItems();
-                gameState = GameState.findMatches;
+                    gameState = GameState.findMatchesAfterSwap;
+                    break;
+
+                case GameState.findMatchesAfterSwap:
+                    if (!isMatchThree(clickedItem1) && !isMatchThree(clickedItem2))
+                    {
+                        swap(clickedItem1, clickedItem2);
+                        gameState = GameState.click;
+                        return;
+                    }
+                    gameState = GameState.findMatches;
+                    break;
+
+                case GameState.findMatches:
+                    findMatches();
+                    gameState = GameState.dropItems;
+                    break;
+
+                case GameState.dropItems:
+                    dropItems();
+                    gameState = GameState.findMatches;
+                    break;
             }
         }
-        public void drawField(SpriteBatch _spriteBatch, Texture2D SimpleTexture, GraphicsDeviceManager graphics)
+        public void drawField(SpriteBatch spriteBatch, Texture2D SimpleTexture)
         {
-            _spriteBatch.DrawString(font, "Score: " + score, new Vector2(730, 5), Color.Black);
-            int[] pixel = { 0xFFFFFF }; // White. 0xFF is Red, 0xFF0000 is Blue
+            spriteBatch.DrawString(font, "Score: " + score, new Vector2(730, 5), Color.Black);
+
+            int[] pixel = { 0xFFFFFF }; 
             SimpleTexture.SetData<int>(pixel, 0, SimpleTexture.Width * SimpleTexture.Height);
 
             int x1 = 0;
@@ -384,7 +344,7 @@ namespace Project1
 
             for (int i = 0; i < Constants.ROWCOUNT + 1; i++)
             {
-                _spriteBatch.Draw(SimpleTexture, new Rectangle(x1, y1, Constants.ROWCOUNT * Constants.CELLSIZE, 1), Color.White);
+                spriteBatch.Draw(SimpleTexture, new Rectangle(x1, y1, Constants.ROWCOUNT * Constants.CELLSIZE, 1), Color.White);
                 y1 += Constants.CELLSIZE;
             }
 
@@ -393,11 +353,11 @@ namespace Project1
 
             for (int i = 0; i < Constants.ROWCOUNT + 1; i++)
             {
-                _spriteBatch.Draw(SimpleTexture, new Rectangle(x1, y1, 1, Constants.ROWCOUNT * Constants.CELLSIZE), Color.White);
+                spriteBatch.Draw(SimpleTexture, new Rectangle(x1, y1, 1, Constants.ROWCOUNT * Constants.CELLSIZE), Color.White);
                 x1 += Constants.CELLSIZE;
             }
 
-            placeItems(_spriteBatch, graphics);
+            placeItems(spriteBatch);
         }
     }
 }

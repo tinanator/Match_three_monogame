@@ -1,15 +1,8 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using MonoGame.Extended.Screens;
-using MonoGame.Extended.Screens.Transitions;
+
 
 namespace Project1
 {
@@ -25,22 +18,22 @@ namespace Project1
     {
         private PlayButton playBtn;
 
-        public SpriteBatch _spriteBatch;
+        public SpriteBatch spriteBatch;
 
         public ScreenState State { get; set; }
         public StartScreen(Game1 game) : base(game) {
             State = ScreenState.Active;
         }
 
-        private Texture2D _texture;
-        private Rectangle _rectangle;
+        private Texture2D texture;
+        private Rectangle rectangle;
         public override void LoadContent()
         {
             base.LoadContent();
-            _spriteBatch = new SpriteBatch(GraphicsDevice);
-            _texture = Content.Load<Texture2D>("btn");
-            _rectangle = new Rectangle(100, 100, 500, 200);
-            playBtn = new PlayButton(_rectangle, _texture);
+            spriteBatch = new SpriteBatch(GraphicsDevice);
+            texture = Content.Load<Texture2D>("btn");
+            rectangle = new Rectangle(150, 150, 500, 200);
+            playBtn = new PlayButton(rectangle, texture);
         }
 
         public override void Update(GameTime gameTime)
@@ -59,9 +52,9 @@ namespace Project1
 
         public override void Draw(GameTime gameTime)
         {
-            _spriteBatch.Begin();
-            playBtn.Draw(_spriteBatch);
-            _spriteBatch.End();
+            spriteBatch.Begin();
+            playBtn.Draw(spriteBatch);
+            spriteBatch.End();
 
         }
     }

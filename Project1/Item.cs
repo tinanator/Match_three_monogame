@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using System.Diagnostics;
-
 
 namespace Project1
 {
@@ -73,11 +65,24 @@ namespace Project1
 
     enum threeMatchState
     {
-        horizontal, vertical, none
+        horizontal,
+        vertical, 
+        none
     }
     class Item
     {
         private Texture2D texture;
+
+        private bool clicked = false;
+        public threeMatchState State { get; set; }
+        public ItemTypes ItemType { get; set; }
+
+        public bool IsToRemove { get; set; }
+
+        private float rotation = 0f;
+        public Position CellPosition { get; set; }
+
+        private Position CoordinatePosition;
         public Item(ItemTypes itemType, Position CellPosition, Texture2D texture)
         {
             this.ItemType = itemType;
@@ -87,8 +92,6 @@ namespace Project1
             this.State = threeMatchState.none;
         }
 
-        private bool clicked = false;
-
         public void setClicked() {
             clicked = true;
         }
@@ -96,29 +99,21 @@ namespace Project1
         public void setUnclicked() {
             clicked = false;
         }
-        public threeMatchState State { get; set; }
-        public ItemTypes ItemType { get; set; }
-
-        public bool isToRemove = false;
-
-        private float rotation = 0f;
-        public void draw(SpriteBatch spriteBatch, GraphicsDeviceManager graphics)
+        public void draw(SpriteBatch spriteBatch)
         {
             if (clicked)
             {
-                rotation += 0.3f;
+                rotation += 0.2f;
             }
             else {
                 rotation = 0f;
             }
+
             CoordinatePosition.update(CellPosition.x * Constants.CELLSIZE, CellPosition.y * Constants.CELLSIZE);
             spriteBatch.Draw(texture, new Rectangle((int)CoordinatePosition.x + Constants.CELLSIZE/2, 
                 (int)CoordinatePosition.y + Constants.CELLSIZE / 2,
                Constants.CELLSIZE, Constants.CELLSIZE), null, Color.Red, rotation, new Vector2(texture.Width/2, texture.Height/2),
                SpriteEffects.None, 0f);
         }
-        public Position CellPosition { get; set; }
-
-        private Position CoordinatePosition;
     }
 }
