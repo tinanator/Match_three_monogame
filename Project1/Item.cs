@@ -110,10 +110,16 @@ namespace Project1
             }
 
             CoordinatePosition.update(CellPosition.x * Constants.CELLSIZE, CellPosition.y * Constants.CELLSIZE);
-            spriteBatch.Draw(texture, new Rectangle((int)CoordinatePosition.x + Constants.CELLSIZE/2, 
-                (int)CoordinatePosition.y + Constants.CELLSIZE / 2,
-               Constants.CELLSIZE, Constants.CELLSIZE), null, Color.Red, rotation, new Vector2(texture.Width/2, texture.Height/2),
-               SpriteEffects.None, 0f);
+
+            spriteBatch.Draw(
+                texture,
+                new Rectangle((int)CoordinatePosition.x + Constants.CELLSIZE/2, 
+                (int)CoordinatePosition.y + Constants.CELLSIZE / 2, Constants.CELLSIZE, Constants.CELLSIZE), 
+                null, 
+                Color.White, 
+                rotation, 
+                new Vector2(texture.Width/2, texture.Height/2),
+                SpriteEffects.None, 0f);
         }
     }
 }

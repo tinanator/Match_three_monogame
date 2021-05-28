@@ -6,14 +6,13 @@ using MonoGame.Extended.Screens;
 
 namespace Project1
 {
-
     public enum ScreenState
-
     {
         TransitionOn,
         Hidden,
         Active
     }
+
     class StartScreen : GameScreen
     {
         private PlayButton playBtn;
@@ -21,7 +20,8 @@ namespace Project1
         public SpriteBatch spriteBatch;
 
         public ScreenState State { get; set; }
-        public StartScreen(Game1 game) : base(game) {
+        public StartScreen(Game1 game) : base(game) 
+        {
             State = ScreenState.Active;
         }
 
@@ -45,7 +45,7 @@ namespace Project1
 
             MouseState state = Mouse.GetState();
             playBtn.Update(state);
-            if (playBtn.IsPressed()) {
+            if (playBtn.IsPressed) {
                 State = ScreenState.TransitionOn;
             }
         }
@@ -55,7 +55,6 @@ namespace Project1
             spriteBatch.Begin();
             playBtn.Draw(spriteBatch);
             spriteBatch.End();
-
         }
     }
 }

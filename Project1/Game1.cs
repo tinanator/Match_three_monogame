@@ -1,7 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using System.Collections.Generic;
 using MonoGame.Extended.Screens;
 using MonoGame.Extended.Screens.Transitions;
 
@@ -52,12 +51,6 @@ namespace Project1
             LoadStartScreen();
 
             base.Initialize();
-        }
-
-        
-        protected override void LoadContent()
-        {
-           
         }
         
         protected override void Update(GameTime gameTime)

@@ -9,7 +9,7 @@ namespace Project1
         private Texture2D texture;
         private Rectangle rectangle;
         private PlayButton closeButton;
-        public bool IsPressed => closeButton.IsPressed();
+        public bool IsPressed => closeButton.IsPressed;
         public GameOverDialog(Texture2D texture, Texture2D btnTexture, Rectangle rectangle) {
             this.texture = texture;
             this.rectangle = rectangle;
@@ -18,8 +18,6 @@ namespace Project1
         public void Draw(SpriteBatch _spriteBatch) {
             _spriteBatch.Draw(texture, rectangle, Color.White);
             closeButton.Draw(_spriteBatch);
-            
-
         }
 
         public void Update(GameTime gameTime) {

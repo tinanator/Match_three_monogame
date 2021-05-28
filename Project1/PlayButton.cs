@@ -6,7 +6,6 @@ namespace Project1
 {
     class PlayButton
     {
-
         private Rectangle rectangle;
         private Texture2D texture;
         private bool isPressed = false;
@@ -28,9 +27,7 @@ namespace Project1
             }
         }
 
-        public bool IsPressed() {
-            return isPressed;
-        }
+        public bool IsPressed => isPressed;
 
         public void Draw(SpriteBatch spriteBatch)
         {
